@@ -1,19 +1,25 @@
 import type { NextConfig } from "next";
 
-// GitHub Pages 프로젝트 사이트(https://euneun9.github.io/test3/)로 배포하기 위한 설정.
-// - output: "export"  → 정적 HTML/CSS/JS 만 생성 (서버 불필요)
-// - basePath          → /test3 하위 경로로 서빙되므로 자산 경로 접두사 지정
-// - trailingSlash     → 각 경로를 폴더/index.html 로 출력해 GitHub Pages 에서 안정적으로 서빙
-const repoBasePath = "/test3";
+// 배포 대상에 따라 설정을 분기한다.
+//
+// - GitHub Pages: 주소가 https://euneun9.github.io/test3/ 처럼 "/test3" 하위 경로다.
+//   → 정적 export(output: "export") + basePath "/test3" 가 필요하다.
+//   → GitHub Pages 용으로 빌드할 때만 GITHUB_PAGES=true 로 켠다.
+//
+// - Vercel / 로컬 dev: 루트 도메인(/)에서 서빙한다.
+//   → basePath 를 주면 루트가 404 나므로, 아무 설정도 주지 않는다.
+const isGithubPages = process.env.GITHUB_PAGES === "true";
 
-const nextConfig: NextConfig = {
-  output: "export",
-  basePath: repoBasePath,
-  trailingSlash: true,
-  images: {
-    // 정적 export 에서는 기본 이미지 최적화를 쓸 수 없으므로 비활성화
-    unoptimized: true,
-  },
-};
+const nextConfig: NextConfig = isGithubPages
+  ? {
+      output: "export",
+      basePath: "/test3",
+      trailingSlash: true,
+      images: {
+        // 정적 export 에서는 기본 이미지 최적화를 쓸 수 없으므로 비활성화
+        unoptimized: true,
+      },
+    }
+  : {};
 
 export default nextConfig;
